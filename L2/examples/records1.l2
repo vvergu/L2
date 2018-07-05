@@ -1,0 +1,11 @@
+record r1 {
+  f1 : Int,
+  f2 : Rec(r1)
+}
+record r2 {
+  f1 : Int,
+  f2 : Int
+}
+begin
+  new r2.f1
+end

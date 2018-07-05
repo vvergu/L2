@@ -1,0 +1,16 @@
+module dynamics/nabl2/nabl2-link
+
+imports
+  ds-signatures/L2-sig
+
+imports
+  dynamics/nabl2/scopegraph-native
+  dynamics/nabl2/frames-native
+  dynamics/nabl2/arrays-native
+
+signature
+  constructors
+    __Occurrence2Occ__: Occurrence -> Occ {implicit}
+//    __Ty2Type__: Ty -> Type {implicit}
+
+  

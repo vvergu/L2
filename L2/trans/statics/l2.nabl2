@@ -1,0 +1,108 @@
+module statics/l2
+
+imports 
+  signatures/-
+  statics/nabl-lib
+
+signature
+  constraint generator
+    [[ Program ^ (scope) ]]
+    [[ Exp ^ (scope) ]]
+
+signature
+  name resolution
+    labels 
+      P I 
+    well-formedness 
+      P* . I*
+    order
+      D < P, 
+      D < I, 
+      I < P
+      
+  namespaces
+    Var Dummy
+
+rules
+  
+  init ^ (s) : ty_init := new s.
+  
+  [[ p@Program(decs, e) ^ (s) : ty ]] :=
+     Dummy{"dummy"} <- s,
+     Dummy{"dummy"} : IntTy() !,
+     @p.bodyScope := s,
+     Map[[ decs ^ (s) ]],
+     [[ e ^ (s) : ty ]].
+  
+  [[ d@Record(r, fields) ^ (s) ]] :=
+    new s_rec,
+    Var{r} <- s,
+    Var{r} : RECORD(s_rec) !,
+    Map[[ fields ^ (s_rec) ]].
+  
+  [[ FieldDec(f, t) ^ (s) ]] :=
+    Var{f} <- s,
+    Var{f} : ty !,
+    [[ t ^ (s) : ty ]].
+  
+  [[ Rec(r) ^ (s) : ty ]] :=
+    Var{r} -> s,
+    Var{r} |-> d,
+    d : ty,
+    ty == RECORD(_).
+  
+  [[ fv@FieldVar(e, x) ^ (s) : ty ]] :=
+    [[ e ^ (s) : ty_rec ]],
+    ty_rec == RECORD(s_rec),
+    new s_use,
+    s_use -I-> s_rec,
+    @fv.bodyScope := s_use,
+    Var{x} -> s_use,
+    Var{x} |-> d,
+    d : ty.
+  
+  [[ Var(x) ^ (s) : ty ]] := 
+    Var{x} -> s,
+    Var{x} |-> d,
+    d : ty.
+  
+  [[ Assign(e1, e2) ^ (s) : ty2 ]] :=
+    [[ e1 ^ (s) : ty1 ]],
+    [[ e2 ^ (s) : ty2 ]],
+    ty1 == ty2.
+  
+  [[ Seq(e1, e2) ^ (s) : ty2 ]] :=
+    [[ e1 ^ (s) : ty1 ]],
+    [[ e2 ^ (s) : ty2 ]].
+  
+  [[ d@Fun(x, t, e) ^ (s) : FunTy(xty, ty) ]] :=
+    @d.bodyScope := s_fun,
+    new s_fun,
+    s_fun -P-> s,
+    Var{x} <- s_fun,
+    Var{x} : xty !,
+    [[ t ^ (s) : xty ]],
+    [[ e ^ (s_fun) : ty ]].
+  
+  [[ Call(f, p) ^ (s) : ty ]] :=
+    [[ f ^ (s) : FunTy(f_ty, ty) ]],
+    [[ p ^ (s) : f_ty ]].
+  
+  [[ Int(_) ^ (s) : IntTy() ]].
+  
+  [[ Plus(e1, e2) ^ (s) : IntTy() ]] :=
+    [[ e1 ^ (s) : IntTy() ]],
+    [[ e2 ^ (s) : IntTy() ]]. 
+
+  [[ IntTy() ^ (s) : IntTy() ]].
+  
+  [[ FunTy(t1, t2) ^ (s) : FunTy(ty1, ty2) ]] :=
+    [[ t1 ^ (s) : ty1 ]],
+    [[ t2 ^ (s) : ty2 ]].
+  
+  [[ RecTy(r) ^ (s) : ty ]] :=
+    Var{r} -> s,
+    Var{r} |-> d,
+    d : ty,
+    ty == RECORD(s_rec).
+   

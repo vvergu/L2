@@ -1,0 +1,3 @@
+begin
+  fun(n : Int){ n; n + 1 }(33)
+end

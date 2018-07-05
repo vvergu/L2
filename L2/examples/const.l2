@@ -1,0 +1,13 @@
+record rec1 {
+  f1 : Int,
+  f2 : Int
+}
+begin
+  fun(r : Rec(rec1)) {
+    r.f1 := 3;
+    fun(x1 : Int) {
+      r.f1 := r.f1 + x1;
+      r
+    }
+  }(new rec1)(3).f1
+end

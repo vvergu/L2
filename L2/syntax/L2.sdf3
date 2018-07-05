@@ -1,0 +1,67 @@
+module L2
+
+imports
+  
+  Common
+
+context-free start-symbols
+  
+  Program
+
+context-free syntax
+  
+  Program.Program = <
+    <{Dec "\n"}*>
+    begin
+      <Exp>
+    end
+  >
+  
+  Dec.Record = <
+    record <Occ> {
+      <{FieldDec ", \n"}*>
+    }
+  >
+  
+  FieldDec.FieldDec = <<Occ> : <Type>>
+  
+  Exp.Seq = <<Exp>; <Exp>> {left}
+  
+  Exp.Int = <<INT>>
+  
+  Exp.Plus = <<Exp> + <Exp>> {left}
+  Exp.Assign = <<Lhs> := <Exp>> {non-assoc}
+  
+  Lhs.Var = <<Occ>>
+  Lhs.FieldVar = <<Exp>.<Occ>>
+  
+  Exp = Lhs
+  
+  Exp.Fun = <
+    fun(<Occ> : <Type>) {
+      <Exp>
+    }
+  >
+  
+  Exp.Call = <<Exp>(<Exp>)>
+  
+  Exp.Rec = <new <Occ>>
+
+  Type.IntTy = <Int>
+  Type.FunTy = [[Type] -> [Type]]
+  Type.RecTy = <Rec(<Occ>)>
+  Type  = Ty
+  
+sorts Ty Scope
+context-free syntax // semantic types
+  Type.RECORD = <RECORD(<Scope>)>
+  
+context-free syntax
+
+  Occ = ID
+
+context-free priorities
+  Lhs.FieldVar > {left: Exp.Plus } > Exp.Assign > {left: Exp.Seq }
+
+  
+

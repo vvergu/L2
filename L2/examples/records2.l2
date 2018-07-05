@@ -1,0 +1,7 @@
+record r1 {
+  f1 : Int,
+  f2 : Rec(r1)
+}
+begin
+  fun(rec : Rec(r1)){ rec.f1 }
+end

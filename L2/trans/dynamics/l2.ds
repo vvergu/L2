@@ -1,0 +1,99 @@
+module dynamics/l2
+
+imports
+  ds-signatures/L2-sig
+  dynamics/values
+  
+signature
+  arrows
+    Program -init-> Val
+    Program --> Val
+    Dec --> U
+    Exp --> Val
+    Lhs --> Addr
+  
+  constructors
+    UndefV: Val
+    
+  variables
+    v : Val
+    
+rules
+  
+  p@Program(_, _) -init-> v
+  where
+     framed(p, []) --> F;
+     F |- p --> v
+  
+  Program(decs, e) --> e
+  where
+    Map-Decs(decs) --> _
+
+  Record(_, _) --> U()
+  
+  Seq(v1, e2) --> e2
+
+signature constructors // functions
+  FunV: Frame * Scope * Occurrence * Exp -> Val
+
+rules
+  default(FunTy(_, _)) --> UndefV()
+  
+  F |- fd@Fun(x : Occurrence, _, e) --> FunV(F, scopeOfTerm(fd), x, e)
+  
+  Call(recv, param) --> v
+  where
+    recv --> FunV(F, s_fun, x, e);
+    frame(s_fun, [L(P(), F)]) --> F_fun;
+    set(Addr(F_fun, x), param) => _;
+    F_fun |- e --> v
+  
+  F |- Var(x : Occurrence) --> lookup(F, x)
+  
+  __Lhs2Exp__(lhs) --> get(lhs)
+  
+  Assign(lhs, e) --> set(lhs, e)
+  
+signature constructors // records
+  RecordV: Frame -> Val
+  NilV: Val
+  
+rules
+  default(RECORD(_)) --> NilV()
+  
+  Rec(x : Occurrence) --> RecordV(F_rec)
+  where
+    typeOf(resolve(x)) => RECORD(s_rec);
+    frame(s_rec, []) --> F_rec
+  
+  fv@FieldVar(e, x : Occurrence) --> lookup(F_use, x)
+  where
+    e --> RecordV(F_rec);
+    framed(fv, [L(I(), F_rec)]) --> F_use
+
+signature constructors // numbers
+  IntV: Int -> Val
+
+rules
+  default(IntTy()) --> IntV(0)
+
+  Int(s) --> IntV(parseI(s))
+  
+  Plus(IntV(i1), IntV(i2)) --> IntV(addI(i1, i2))
+
+signature // library
+  native operators
+    parseI: String -> Int
+    addI: Int * Int -> Int
+  arrows
+    Map-Decs(List(Dec)) --> U
+
+rules
+  
+  Map-Decs([]) --> U()
+  
+  Map-Decs([d|ds]) --> Map-Decs(ds)
+  where
+    d --> _
+
+  

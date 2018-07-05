@@ -1,0 +1,24 @@
+
+/bin
+/target
+/.project
+/.classpath
+/.settings
+/.factorypath
+src/main/resources/signatures-digest.cache
+src/main/resources/specification.aterm
+src/main/resources/parsetable.tbl
+src/main/resources/logback.xml
+src/main/java/l2/interpreter/generated
+src/main/java/l2/interpreter/generated/terms
+src/main/java/l2/interpreter/generated/terms/build
+src/main/java/l2/interpreter/generated/terms/match
+src/test/java/l2/interpreter/generated/test
+/L2.launch
+/TestL2.launch
+/L2 (Core).launch
+/L2 (Daemon).launch
+/L2-core
+/L2-server
+/L2-client
+/L2
